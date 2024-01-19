@@ -1,0 +1,9 @@
+.AppleDouble
+build
+.DS_Store
+*.swo
+*.swp
+dist
+__pycache__
+*egg-info
+test
