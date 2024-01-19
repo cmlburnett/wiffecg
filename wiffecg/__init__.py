@@ -51,7 +51,7 @@ class WIFFECG:
 
 		return ret
 
-	def ExportToPDF(self, fname, speed=200):
+	def ExportToPDF(self, fname, speed=100):
 		"""
 		Export EKG tracing to a PDF file at @fname.
 		Save at @speed mm/sec (default 25).
@@ -60,12 +60,14 @@ class WIFFECG:
 		leads = self.GetLeads()
 		width = 8.0
 
+		# Determine how many samples per page
 		freq = self.wiff.recording[1].sampling
 		samps = (width * 25.4) / speed * freq
 		step = int(samps)
 
 		pyplot.rcParams["figure.figsize"] = [width, 10.0]
 		pyplot.rcParams["figure.autolayout"] = True
+		pyplot.rcParams["xtick.labelsize"] = 'small'
 
 		with PdfPages(fname) as pp:
 			fig,axes = pyplot.subplots(len(leads))
@@ -73,23 +75,39 @@ class WIFFECG:
 			times = []
 			vals = [[] for _ in range(len(leads))]
 			for f in self.wiff.recording[1].GetAllFrames():
+				# Every time the remainder trips zero, that's a new page so save it
+
+				# First frame is zero, but no need to save it yet so skirt around this by adding one
 				page,r = divmod(f[0]+1, step)
+
+				# Save new page of data
 				if r == 0:
 					print([f[0], page,r, len(times), len(vals), len(vals[0]), len(vals[1])])
 					for i in range(len(leads)):
 						lead = leads[i]
+						if lead.startswith("Lead "):
+							lead = lead.split("Lead ")[1]
 						axes[i].cla()
 						axes[i].set_ylabel(lead)
 						axes[i].plot(times, vals[i])
-						axes[i].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
-						axes[i].xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter("{x:.2f}"))
-						axes[i].xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.025))
+
+						# TODO: These should change depending on the speed
+						axes[i].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.5))
+						axes[i].xaxis.set_major_formatter(matplotlib.ticker.StrMethodFormatter("{x:.1f}"))
+						axes[i].xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.05))
+
+						# Only show label on bottom subplot
+						if i+1 == len(leads):
+							axes[i].set_xlabel("Time (sec)")
+
+					# Save the figure, clear it, and clear the data (rather than making a new figure each time == memory wasteful)
 					pp.savefig(fig)
 					pyplot.cla()
 					for v in vals:
 						v.clear()
 					times.clear()
 
+				# Append time and data
 				times.append(f[0]/freq)
 				for i in range(len(leads)):
 					vals[i].append(f[2][i])
