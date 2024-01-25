@@ -1,7 +1,11 @@
+import datetime
+
 import wiff
 import matplotlib
 from matplotlib import pyplot
 from matplotlib.backends.backend_pdf import PdfPages
+
+import pyiworxekgedfimport
 
 class WIFFECG:
 	def __init__(self, fname):
@@ -18,6 +22,13 @@ class WIFFECG:
 	@property
 	def wiff(self):
 		return self._wiff
+
+	def __enter__(self):
+		return self
+
+	def __exit__(self, *args):
+		self.close()
+		return False
 
 	def Validate(self):
 		"""
@@ -50,6 +61,43 @@ class WIFFECG:
 			ret.append(chan.name)
 
 		return ret
+
+	@staticmethod
+	def ImportFromIWorxEDF(inpath, outpath):
+		"""
+		Using IWorx's LabScribe, export an EKG recording as an EDF file.
+		This uses pyiworxekgedfimport to import the data into a WIFF file.
+		@inpath is file path to the EDF file.
+		@outpath is the file path to save the WIFF file at.
+		"""
+
+		with pyiworxekgedfimport.EDFReader.open(inpath) as o:
+			props = {
+				'start': o.Start,
+				'end': o.Start + datetime.timedelta(seconds=o.Duration),
+				'description': 'iWorx LabScribe EDF file',
+				'fs': 2000, # FIXME
+				'channels': [],
+			}
+
+			for idx,ch in enumerate(o.Signals):
+				if ch['Label'] == 'EDF Annotations':
+					continue
+
+				props['channels'].append({
+					'idx': idx,
+					'name': ch['Label'],
+					'bits': 16,
+					'unit': ch['PhysicalDimension'],
+					'digitalminvalue': ch['DigitalMinimum'],
+					'digitalmaxvalue': ch['DigitalMaximum'],
+					'analogminvalue': ch['PhysicalMinimum'],
+					'analogmaxvalue': ch['PhysicalMaximum'],
+					'comment': 'Physical (%d,%d) to (%d,%d)' % (ch['PhysicalMinimum'],ch['PhysicalMaximum'], ch['DigitalMinimum'],ch['DigitalMaximum']),
+				})
+
+			# Save data to file
+			o.writeWIFF(outpath, props)
 
 	def ExportToPDF(self, fname, speed=100):
 		"""
