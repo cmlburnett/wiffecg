@@ -134,7 +134,6 @@ class WIFFECG:
 
 				# Save new page of data
 				if r == 0:
-					print([f[0], page,r, len(times), len(vals), len(vals[0]), len(vals[1])])
 					for i in range(len(leads)):
 						lead = leads[i]
 						if lead.startswith("Lead "):
