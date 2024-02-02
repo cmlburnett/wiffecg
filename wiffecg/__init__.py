@@ -30,6 +30,10 @@ class WIFFECG:
 		self.close()
 		return False
 
+	def GetDuration(self):
+		delta = self.wiff.recording[1].end - self.wiff.recording[1].start
+		return delta.total_seconds()
+
 	def Validate(self):
 		"""
 		WIFF must meet certain conditions to be considered an ECG.
