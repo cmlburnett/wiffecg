@@ -308,8 +308,15 @@ class WIFFECG:
 			else:
 				raise NotImplementedError("Should not reach this point")
 
+		return z.IsStateCompleted
+
 class ZipMan:
-	class ProcessingStateEnum(enum.EnumInt):
+	"""
+	ZipMan -- Zip Manager
+	Wraps a zip file to store state in a pickle file and other output files.
+	"""
+
+	class ProcessingStateEnum(enum.IntEnum):
 		EMPTY = 0
 		INITIALIZED = 1
 		CORRELATE = 2
