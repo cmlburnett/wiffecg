@@ -448,7 +448,7 @@ class ZipMan:
 		self._zip = zipfile.ZipFile(self.Filename, 'a')
 
 		# Write empty state if not existant or read what's there
-		if 'state.pypickle' not in z.namelist():
+		if 'state.pypickle' not in self.Zip.namelist():
 			with self.Zip.open('state.pypickle', 'w') as f:
 				pickle.dump(self.State, f)
 		else:
