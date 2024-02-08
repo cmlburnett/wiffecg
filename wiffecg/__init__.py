@@ -186,20 +186,15 @@ class WIFFECG:
 		# Round to the nearest frame
 		intervals_user_frames = {}
 		for k,v in intervals['user'].items():
-			intervals_user_frames[k] = [(round(_[0]*samp),round(_[1]*samp)) for _ in intervals]
+			intervals_user_frames[k] = [(round(_[0]*samp),round(_[1]*samp)) for _ in v]
 
 		intervals_ignore_frames = []
 		for v in intervals['ignore']:
-			intervals_ignore_frames.append( (round(_[0]*samp),round(_[1]*samp)) )
+			intervals_ignore_frames.append( (round(v[0]*samp),round(v[1]*samp)) )
 
 		intervals_noise_frames = []
 		for v in intervals['noise']:
-			intervals_noise_frames.append( (round(_[0]*samp),round(_[1]*samp)) )
-
-		print(intervals_user_frames)
-		print(intervals_ignore_frames)
-		print(intervals_noise_frames)
-		raise NotImplementedError
+			intervals_noise_frames.append( (round(v[0]*samp),round(v[1]*samp)) )
 
 		with ZipMan(fname) as z:
 			if z.IsStateEmpty:
