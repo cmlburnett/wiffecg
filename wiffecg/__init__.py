@@ -296,7 +296,7 @@ class WIFFECG:
 					z.SetStateCompleted()
 				z.SaveState()
 
-			elif z.IsStateSavePDF
+			elif z.IsStateSavePDF:
 				print("Save as PDF")
 
 				z.SetStateCompleted()
