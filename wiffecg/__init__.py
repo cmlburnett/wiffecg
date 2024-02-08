@@ -469,6 +469,7 @@ class ZipMan:
 
 	def __enter__(self):
 		self.open()
+		return self
 
 	def __exit__(self, *kargs):
 		if self.Zip:
