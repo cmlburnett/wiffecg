@@ -399,37 +399,37 @@ class ZipMan:
 
 
 	def SetStatEmpty(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.EMPTY
+		self._state['state'] = ZipMan.ProcessingStateEnum.EMPTY
 
 	def SetStatInitialized(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.INITIALIZED
+		self._state['state'] = ZipMan.ProcessingStateEnum.INITIALIZED
 
 	def SetStateCorrelate(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.CORRELATE
+		self._state['state'] = ZipMan.ProcessingStateEnum.CORRELATE
 
 	def SetStateKeepKeys(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.KEEPKEYS
+		self._state['state'] = ZipMan.ProcessingStateEnum.KEEPKEYS
 
 	def SetStateRemoveKeys(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.REMOVEKEYS
+		self._state['state'] = ZipMan.ProcessingStateEnum.REMOVEKEYS
 
 	def SetStateUserFilter(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.USERFILTER
+		self._state['state'] = ZipMan.ProcessingStateEnum.USERFILTER
 
 	def SetStateCalculateRR(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.CALCULATERR
+		self._state['state'] = ZipMan.ProcessingStateEnum.CALCULATERR
 
 	def SetStateSavePNG(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.SAVEPNG
+		self._state['state'] = ZipMan.ProcessingStateEnum.SAVEPNG
 
 	def SetStateSavePDF(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.SAVEPDF
+		self._state['state'] = ZipMan.ProcessingStateEnum.SAVEPDF
 
 	def SetStateCompleted(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.COMPLETED
+		self._state['state'] = ZipMan.ProcessingStateEnum.COMPLETED
 
 	def SetStateError(self):
-		self._state['state'] = ZipMan.ProcessRRToZip.ERROR
+		self._state['state'] = ZipMan.ProcessingStateEnum.ERROR
 
 	def SetError(self, e, tb, msg, dat=None):
 		"""
