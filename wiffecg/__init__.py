@@ -2,6 +2,7 @@ import datetime
 import enum
 import os
 import pickle
+import subprocess
 import zipfile
 
 import wiff
@@ -463,6 +464,20 @@ class ZipMan:
 		self._zip = None
 
 	def SaveState(self):
+		if os.path.exists(self.Filename):
+			# See if state file exists
+			exists = False
+			if 'state.pypickle' in self.Zip.namelist():
+				exists = True
+
+			# ZipFile doesn't support delete, astounding
+			if exists:
+				# Close, delete, reopen
+				self.Zip.close()
+				args = ['zip', '-q', self.Filename, '-d', 'state.pypickle']
+				subprocess.run(args)
+				self._zip = zipfile.ZipFile(self.Filename, 'a')
+
 		# Save the state
 		with self.Zip.open('state.pypickle', 'w') as f:
 			pickle.dump(self.State, f)
