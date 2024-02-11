@@ -198,6 +198,7 @@ class WIFFECG:
 			intervals_noise_frames.append( (round(v[0]*samp),round(v[1]*samp)) )
 
 		with ZipMan(fname) as z:
+			print(z.State['state'])
 			if z.IsStateEmpty:
 				# Start processing from the start, do any initializing
 				z.State['Channels'] = self.GetLeads()
@@ -224,8 +225,8 @@ class WIFFECG:
 				potentials = z.State['Potentials']
 				peaks = z.State['Peaks']
 
-				p = pyzestyecg(self.wiff)
-				correlate = p.GetCorrelate(chan, potentials, peaks)
+				p = pyzestyecg(self.wiff, params)
+				correlate = p.GetCorrelate(chans, potentials, peaks)
 
 				z.State['Correlate'] = correlate
 				z.SetStateKeepKeys()
@@ -235,7 +236,7 @@ class WIFFECG:
 				chans = z.State['Channels']
 				peaks = z.State['Peaks']
 
-				p = pyzestyecg(self.wiff)
+				p = pyzestyecg(self.wiff, params)
 				points, keep = p.GetKeepKeys(chans, peaks)
 
 				z.State['Keep'] = keep
@@ -249,7 +250,7 @@ class WIFFECG:
 				points = z.State['Points']
 				keep = z.State['Keep']
 
-				p = pyzestyecg(self.wiff)
+				p = pyzestyecg(self.wiff, params)
 				remove = p.GetRemoveKeys(chans, correlate, points, keep)
 
 				z.State['Remove'] = remove
@@ -263,7 +264,7 @@ class WIFFECG:
 				remove = z.State['Remove']
 				user = z.State['UserFilter']
 
-				p = pyzestyecg(self.wiff)
+				p = pyzestyecg(self.wiff, params)
 				p.CheckUserFilter(chans, points, keep, remove, user)
 
 				z.SetStateCalculateRR()
@@ -276,8 +277,8 @@ class WIFFECG:
 				remove = z.State['Remove']
 				user = z.State['UserFilter']
 
-				p = pyzestyecg(self.wiff)
-				p.CalculateRR(chans, keep, remove, user, intervals_user_frames, intervals_noise_frames, params)
+				p = pyzestyecg(self.wiff, params)
+				p.CalculateRR(chans, keep, remove, user, intervals_user_frames, intervals_noise_frames)
 
 				if savepng:
 					z.SetStateSavePNG()
@@ -464,6 +465,7 @@ class ZipMan:
 		self._zip = None
 
 	def SaveState(self):
+		print(['save', self.State['state']])
 		if os.path.exists(self.Filename):
 			# See if state file exists
 			exists = False
