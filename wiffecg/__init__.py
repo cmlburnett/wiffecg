@@ -198,7 +198,7 @@ class WIFFECG:
 			intervals_noise_frames.append( (round(v[0]*samp),round(v[1]*samp)) )
 
 		with ZipMan(fname) as z:
-			print(z.State['state'])
+			print([z.State['state'], datetime.datetime.utcnow()])
 			if z.IsStateEmpty:
 				# Start processing from the start, do any initializing
 				z.State['Channels'] = self.GetLeads()
@@ -272,13 +272,14 @@ class WIFFECG:
 
 			elif z.IsStateCalculateRR:
 				chans = z.State['Channels']
+				peaks = z.State['Peaks']
 				correlate = z.State['Correlate']
 				keep = z.State['Keep']
 				remove = z.State['Remove']
 				user = z.State['UserFilter']
 
 				p = pyzestyecg(self.wiff, params)
-				p.CalculateRR(chans, keep, remove, user, intervals_user_frames, intervals_noise_frames)
+				p.CalculateRR(chans, peaks, correlate, keep, remove, user, intervals_user_frames, intervals_noise_frames)
 
 				if savepng:
 					z.SetStateSavePNG()
