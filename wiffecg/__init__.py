@@ -1,5 +1,6 @@
 import datetime
 import enum
+import io
 import os
 import pickle
 import subprocess
@@ -199,6 +200,7 @@ class WIFFECG:
 
 		with ZipMan(fname) as z:
 			print([z.State['state'], datetime.datetime.utcnow()])
+
 			if z.IsStateEmpty:
 				# Start processing from the start, do any initializing
 				z.State['Channels'] = self.GetLeads()
@@ -291,7 +293,21 @@ class WIFFECG:
 
 
 			elif z.IsStateSavePNG:
+				peaks = z.State['Peaks']
 				print("Save as PNG")
+
+				def filegen(idx):
+					# Must close object to delete data
+					return io.BytesIO()
+
+				def filesave(idx, obj):
+					z.WriteFile('ecg%04d.png' % idx, obj.getvalue())
+
+					# Delete the data
+					obj.close()
+
+				p = pyzestyecg(self.wiff, params)
+				p.ExportPNG(peaks, filegen, filesave, width=10, speed=200)
 
 				if savepdf:
 					z.SetStateSavePDF()
@@ -465,6 +481,19 @@ class ZipMan:
 		self._zip.close()
 		self._zip = None
 
+	def WriteFile(self, fname, dat):
+		if fname in self.Zip.namelist():
+			# ZipFile doesn't support delete, astounding
+			# Close, delete file, reopen
+			self.Zip.close()
+			args = ['zip', '-q', self.Filename, '-d', fname]
+			subprocess.run(args)
+			self._zip = zipfile.ZipFile(self.Filename, 'a')
+
+		# Write data to a file
+		with self.Zip.open(fname, 'w') as f:
+			f.write(dat)
+
 	def SaveState(self):
 		print(['save', self.State['state']])
 		if os.path.exists(self.Filename):
@@ -475,7 +504,7 @@ class ZipMan:
 
 			# ZipFile doesn't support delete, astounding
 			if exists:
-				# Close, delete, reopen
+				# Close, delete file, reopen
 				self.Zip.close()
 				args = ['zip', '-q', self.Filename, '-d', 'state.pypickle']
 				subprocess.run(args)
