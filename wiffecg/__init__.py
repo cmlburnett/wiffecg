@@ -209,7 +209,8 @@ class WIFFECG:
 				z.State['Correlate'] = None
 				z.State['Keep'] = None
 				z.State['Remove'] = None
-				z.State['UserFilter'] = None
+				z.State['UserFilter'] = {'Keep': {}, 'Remove': {}, 'Params': {}}
+				z.State['Final'] = None
 				z.SetStatInitialized()
 				z.SaveState()
 
@@ -279,10 +280,12 @@ class WIFFECG:
 				keep = z.State['Keep']
 				remove = z.State['Remove']
 				user = z.State['UserFilter']
+				final = z.State['Final']
 
 				p = pyzestyecg(self.wiff, params)
-				p.CalculateRR(chans, peaks, correlate, keep, remove, user, intervals_user_frames, intervals_noise_frames)
+				final = p.CalculateRR(chans, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames)
 
+				z.State['Final'] = final
 				if savepng:
 					z.SetStateSavePNG()
 				elif savepdf:
@@ -293,7 +296,7 @@ class WIFFECG:
 
 
 			elif z.IsStateSavePNG:
-				peaks = z.State['Peaks']
+				final = z.State['Final']
 				print("Save as PNG")
 
 				def filegen(idx):
@@ -307,7 +310,7 @@ class WIFFECG:
 					obj.close()
 
 				p = pyzestyecg(self.wiff, params)
-				p.ExportPNG(peaks, filegen, filesave, width=10, speed=200)
+				p.ExportPNG(final, filegen, filesave, width=10, speed=200)
 
 				if savepdf:
 					z.SetStateSavePDF()
@@ -491,7 +494,10 @@ class ZipMan:
 			self._zip = zipfile.ZipFile(self.Filename, 'a')
 
 		# Write data to a file
-		with self.Zip.open(fname, 'w') as f:
+		now = datetime.datetime.now()
+		# Why wouldn't open be able to include the date???
+		zi = zipfile.ZipInfo(fname, (now.year, now.month, now.day, now.hour, now.minute, now.second))
+		with self.Zip.open(zi, 'w') as f:
 			f.write(dat)
 
 	def SaveState(self):
@@ -511,7 +517,10 @@ class ZipMan:
 				self._zip = zipfile.ZipFile(self.Filename, 'a')
 
 		# Save the state
-		with self.Zip.open('state.pypickle', 'w') as f:
+		now = datetime.datetime.now()
+		# Why wouldn't open be able to include the date???
+		zi = zipfile.ZipInfo('state.pypickle', (now.year, now.month, now.day, now.hour, now.minute, now.second))
+		with self.Zip.open(zi, 'w') as f:
 			pickle.dump(self.State, f)
 
 	def __enter__(self):
