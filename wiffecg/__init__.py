@@ -325,7 +325,7 @@ class WIFFECG:
 				z.SaveState()
 
 			elif z.IsStateCompleted:
-				raise NotImplementedError("Should not reach this point")
+				print("Already done, nothing to do")
 
 			else:
 				raise NotImplementedError("Should not reach this point")
