@@ -507,7 +507,6 @@ class ZipMan:
 			f.write(dat)
 
 	def SaveState(self):
-		print(['save', self.State['state']])
 		if os.path.exists(self.Filename):
 			# See if state file exists
 			exists = False
@@ -519,9 +518,7 @@ class ZipMan:
 				# Close, delete file, reopen
 				self.Zip.close()
 				args = ['zip', '-Ar', '-q', self.Filename, '-d', 'state.pypickle']
-				print(['delete file in zip', args])
 				subprocess.run(args)
-				print(['delete file in zip', args])
 				self._zip = zipfile.ZipFile(self.Filename, 'a')
 
 		# Save the state
