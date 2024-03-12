@@ -521,6 +521,7 @@ class ZipMan:
 				args = ['zip', '-Ar', '-q', self.Filename, '-d', 'state.pypickle']
 				print(['delete file in zip', args])
 				subprocess.run(args)
+				print(['delete file in zip', args])
 				self._zip = zipfile.ZipFile(self.Filename, 'a')
 
 		# Save the state
