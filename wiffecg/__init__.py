@@ -187,16 +187,19 @@ class WIFFECG:
 		# intervals are in seconds, convert to framex by multiplying by the sampling rate
 		# Round to the nearest frame
 		intervals_user_frames = {}
-		for k,v in intervals['user'].items():
-			intervals_user_frames[k] = [(round(_[0]*samp),round(_[1]*samp)) for _ in v]
+		if 'intervals' in intervals:
+			for k,v in intervals['intervals'].items():
+				intervals_user_frames[k] = [(round(_[0]*samp),round(_[1]*samp)) for _ in v]
 
 		intervals_ignore_frames = []
-		for v in intervals['ignore']:
-			intervals_ignore_frames.append( (round(v[0]*samp),round(v[1]*samp)) )
+		if 'ignore' in intervals:
+			for v in intervals['ignore']:
+				intervals_ignore_frames.append( (round(v[0]*samp),round(v[1]*samp)) )
 
 		intervals_noise_frames = []
-		for v in intervals['noise']:
-			intervals_noise_frames.append( (round(v[0]*samp),round(v[1]*samp)) )
+		if 'noise' in intervals:
+			for v in intervals['noise']:
+				intervals_noise_frames.append( (round(v[0]*samp),round(v[1]*samp)) )
 
 		with ZipMan(fname) as z:
 			print([z.State['state'], datetime.datetime.utcnow()])
