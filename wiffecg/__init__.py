@@ -495,7 +495,7 @@ class ZipMan:
 			# ZipFile doesn't support delete, astounding
 			# Close, delete file, reopen
 			self.Zip.close()
-			args = ['zip', '-q', self.Filename, '-d', fname]
+			args = ['zip', '-Ar', '-q', self.Filename, '-d', fname]
 			subprocess.run(args)
 			self._zip = zipfile.ZipFile(self.Filename, 'a')
 
