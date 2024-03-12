@@ -286,9 +286,41 @@ class WIFFECG:
 				final = z.State['Final']
 
 				p = pyzestyecg(self.wiff, params)
-				final = p.CalculateRR(chans, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames)
+				final = p.CalculateRR_whole(chans, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames)
 
 				z.State['Final'] = final
+				z.SetStateExportRR()
+				z.SaveState()
+
+			elif z.IsStateExportRR:
+				chans = z.State['Channels']
+				peaks = z.State['Peaks']
+				correlate = z.State['Correlate']
+				keep = z.State['Keep']
+				remove = z.State['Remove']
+				user = z.State['UserFilter']
+				final = z.State['Final']
+
+				def filegen(doesntmatter):
+					# Must close object to delete data
+					return io.BytesIO()
+
+				def filesave_PeaksByPNG(idx, obj):
+					z.WriteFile('processed/ecg%04d.png' % idx, obj.getvalue())
+
+					# Delete the data
+					obj.close()
+
+				def filesave_RR(cname, obj):
+					z.WriteFile('RR/%s.txt' % cname, obj.getvalue())
+
+					# Delete the data
+					obj.close()
+
+				p = pyzestyecg(self.wiff, params)
+				p.ExportPeaksByPNG(chans, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames, filegen, filesave_PeaksByPNG, width=10, speed=200)
+				p.ExportRR(chans, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames, filegen, filesave_RR)
+
 				if savepng:
 					z.SetStateSavePNG()
 				elif savepdf:
@@ -297,10 +329,8 @@ class WIFFECG:
 					z.SetStateCompleted()
 				z.SaveState()
 
-
 			elif z.IsStateSavePNG:
 				final = z.State['Final']
-				print("Save as PNG")
 
 				def filegen(idx):
 					# Must close object to delete data
@@ -322,8 +352,6 @@ class WIFFECG:
 				z.SaveState()
 
 			elif z.IsStateSavePDF:
-				print("Save as PDF")
-
 				z.SetStateCompleted()
 				z.SaveState()
 
@@ -352,8 +380,9 @@ class ZipMan:
 		REMOVEKEYS = 4
 		USERFILTER = 5
 		CALCULATERR = 6
-		SAVEPNG = 7
-		SAVEPDF = 8
+		EXPORTRR = 7
+		SAVEPNG = 8
+		SAVEPDF = 9
 		COMPLETED = 100
 
 		ERROR = 1000
@@ -408,6 +437,10 @@ class ZipMan:
 		return self._state['state'] == ZipMan.ProcessingStateEnum.CALCULATERR
 
 	@property
+	def IsStateExportRR(self):
+		return self._state['state'] == ZipMan.ProcessingStateEnum.EXPORTRR
+
+	@property
 	def IsStateSavePNG(self):
 		return self._state['state'] == ZipMan.ProcessingStateEnum.SAVEPNG
 
@@ -448,6 +481,9 @@ class ZipMan:
 
 	def SetStateCalculateRR(self):
 		self._state['state'] = ZipMan.ProcessingStateEnum.CALCULATERR
+
+	def SetStateExportRR(self):
+		self._state['state'] = ZipMan.ProcessingStateEnum.EXPORTRR
 
 	def SetStateSavePNG(self):
 		self._state['state'] = ZipMan.ProcessingStateEnum.SAVEPNG
