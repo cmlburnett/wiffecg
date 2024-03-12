@@ -151,7 +151,7 @@ class WIFFECG:
 
 						# TODO: These should change depending on the speed
 						axes[i].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.5))
-						axes[i].xaxis.set_major_formatter(matplotlib.ticker.StrMethodFormatter("{x:.1f}"))
+						axes[i].xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x: "%.1f"%x))
 						axes[i].xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.05))
 
 						# Only show label on bottom subplot
