@@ -518,7 +518,8 @@ class ZipMan:
 			if exists:
 				# Close, delete file, reopen
 				self.Zip.close()
-				args = ['zip', '-q', self.Filename, '-d', 'state.pypickle']
+				args = ['zip', '-Ar', '-q', self.Filename, '-d', 'state.pypickle']
+				print(['delete file in zip', args])
 				subprocess.run(args)
 				self._zip = zipfile.ZipFile(self.Filename, 'a')
 
