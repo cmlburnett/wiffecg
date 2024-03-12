@@ -307,7 +307,7 @@ class WIFFECG:
 					return io.BytesIO()
 
 				def filesave(idx, obj):
-					z.WriteFile('ecg%04d.png' % idx, obj.getvalue())
+					z.WriteFile('processed/ecg%04d.png' % idx, obj.getvalue())
 
 					# Delete the data
 					obj.close()
