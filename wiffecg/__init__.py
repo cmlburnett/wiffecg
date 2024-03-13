@@ -294,6 +294,7 @@ class WIFFECG:
 
 			elif z.IsStateExportRR:
 				chans = z.State['Channels']
+				potentials = z.State['Potentials']
 				peaks = z.State['Peaks']
 				correlate = z.State['Correlate']
 				keep = z.State['Keep']
@@ -318,7 +319,7 @@ class WIFFECG:
 					obj.close()
 
 				p = pyzestyecg(self.wiff, params)
-				p.ExportPeaksByPNG(chans, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames, filegen, filesave_PeaksByPNG, width=10, speed=200)
+				p.ExportPeaksByPNG(chans, potentials, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames, filegen, filesave_PeaksByPNG, width=10, speed=200)
 				p.ExportRR(chans, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames, filegen, filesave_RR)
 
 				if savepng:
