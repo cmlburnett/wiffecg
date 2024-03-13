@@ -306,9 +306,9 @@ class WIFFECG:
 					# Must close object to delete data
 					return io.BytesIO()
 
-				def filesave_PeaksByPNG(idx, obj):
+				def filesave_PeaksByPNG(idx, cname, obj):
 					obj.seek(0)
-					z.WriteFile('processed/ecg%04d.txt' % idx, obj.getvalue())
+					z.WriteFile('processed/ecg%04d-%s.txt' % (idx,cname), obj.getvalue())
 
 					# Delete the data
 					obj.close()
@@ -321,7 +321,7 @@ class WIFFECG:
 					obj.close()
 
 				p = pyzestyecg(self.wiff, params)
-				p.ExportPeaksByPNG(chans, potentials, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames, filegen, filesave_PeaksByPNG, width=10, speed=200)
+				p.ExportPeaksByPNG(chans, potentials, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames, filegen, filesave_PeaksByPNG, filesave_RR, width=10, speed=200)
 				p.ExportRR(chans, peaks, correlate, keep, remove, user, final, intervals_user_frames, intervals_noise_frames, filegen, filesave_RR)
 
 				if savepng:
