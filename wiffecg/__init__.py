@@ -307,12 +307,14 @@ class WIFFECG:
 					return io.BytesIO()
 
 				def filesave_PeaksByPNG(idx, obj):
-					z.WriteFile('processed/ecg%04d.png' % idx, obj.getvalue())
+					obj.seek(0)
+					z.WriteFile('processed/ecg%04d.txt' % idx, obj.getvalue())
 
 					# Delete the data
 					obj.close()
 
 				def filesave_RR(cname, obj):
+					obj.seek(0)
 					z.WriteFile('RR/%s.txt' % cname, obj.getvalue())
 
 					# Delete the data
@@ -338,6 +340,7 @@ class WIFFECG:
 					return io.BytesIO()
 
 				def filesave(idx, obj):
+					obj.seek(0)
 					z.WriteFile('processed/ecg%04d.png' % idx, obj.getvalue())
 
 					# Delete the data
