@@ -252,12 +252,14 @@ class WIFFECG:
 
 			elif z.IsStateRemoveKeys:
 				chans = z.State['Channels']
+				potentials = z.State['Potentials']
+				peaks = z.State['Peaks']
 				correlate = z.State['Correlate']
 				points = z.State['Points']
 				keep = z.State['Keep']
 
 				p = pyzestyecg(self.wiff, params)
-				remove = p.GetRemoveKeys(chans, correlate, points, keep)
+				remove = p.GetRemoveKeys(chans, potentials, peaks, correlate, points, keep)
 
 				z.State['Remove'] = remove
 				z.SetStateUserFilter()
